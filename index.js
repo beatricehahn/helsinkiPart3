@@ -1,6 +1,10 @@
 const express = require('express')
 const app = express()
 
+const morgan = require('morgan')
+
+app.use(morgan('tiny'))
+
 let contacts = [
     { 
       "id": 1,
@@ -32,6 +36,57 @@ app.get('/', (request, response) => {
 // handles HTTP GET requests made to the contacts path
 app.get('/api/persons', (request, response) => {
     response.json(contacts)
+})
+
+// handles GET request for single resource (one person)
+app.get('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    const person = contacts.find(person => person.id === id)
+
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(400).end()
+    }
+})
+
+// DELETE request
+app.delete('./api/notes/:id', (request, response) => {
+  const id = Number(request.params.id)
+  contacts = contacts.filter(person => person.id !== id)
+  response.status(204).end()
+})
+
+const generateId = () => {
+  const newId = contacts.length > 0
+    ? Math.max(...contacts.map(i => i.id))
+    : 0
+  return newId + 1
+}
+
+// POST request
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: 'Name or number is missing'
+    })
+  } else if (contacts.find(person => person.name === body.name)) {
+    return response.status(400).json({
+      error: 'Name must be unique'
+    })
+  }
+
+  const newPerson = {
+    id: generateId(),
+    name: body.name,
+    number: body.number,
+  }
+
+  contacts = contacts.concat(newPerson)
+
+  response.json(newPerson)
 })
 
 app.get('/info', (request, response) => {
