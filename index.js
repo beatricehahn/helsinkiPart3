@@ -1,3 +1,27 @@
+// ============ mongoose code ============
+const mongoose = require('mongoose')
+
+// if password includes special characters, this will encode into URI
+const password = encodeURIComponent(process.argv[3])
+
+const url = 
+  `mongodb+srv://hahnb:${password}@phonebook.mkgt8uc.mongodb.net/?retryWrites=true&w=majority`
+
+mongoose.set('strictQuery',false)
+mongoose.connect(url)
+
+// contact schema
+const contactSchema = new mongoose.Schema({
+  name: String,
+  number: String
+})
+
+// contact model
+const Contacts = mongoose.model('Contact', contactSchema)
+
+
+// ================= mongoose code ends here ==========
+
 const express = require('express')
 const app = express()
 
