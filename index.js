@@ -2,18 +2,33 @@
 const mongoose = require('mongoose')
 
 // if password includes special characters, this will encode into URI
-const password = encodeURIComponent(process.argv[3])
+const password = encodeURIComponent(process.argv[2])
 
 const url = 
   `mongodb+srv://hahnb:${password}@phonebook.mkgt8uc.mongodb.net/?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery',false)
+
 mongoose.connect(url)
+  .then(result => {
+    console.log('Established connection with db');
+  })
+  .catch((error) => {
+    console.log('Error connecting to MongoDB:', error.message);
+  })
 
 // contact schema
 const contactSchema = new mongoose.Schema({
   name: String,
   number: String
+})
+
+contactSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObbject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
 })
 
 // contact model
@@ -72,69 +87,75 @@ app.get('/', (request, response) => {
 
 // handles HTTP GET requests made to the contacts path
 app.get('/api/persons', (request, response) => {
-    response.json(contacts)
+    Contacts
+      .find({})
+      .then(notes => {
+        response.json(notes)
+
+        //mongoose.connection.close()
+      })
 })
 
-// handles GET request for single resource (one person)
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = contacts.find(person => person.id === id)
+// // handles GET request for single resource (one person)
+// app.get('/api/persons/:id', (request, response) => {
+//     const id = Number(request.params.id)
+//     const person = contacts.find(person => person.id === id)
 
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(400).end()
-    }
-})
+//     if (person) {
+//       response.json(person)
+//     } else {
+//       response.status(400).end()
+//     }
+// })
 
-// DELETE request
-app.delete('./api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  contacts = contacts.filter(person => person.id !== id)
-  response.status(204).end()
-})
+// // DELETE request
+// app.delete('./api/notes/:id', (request, response) => {
+//   const id = Number(request.params.id)
+//   contacts = contacts.filter(person => person.id !== id)
+//   response.status(204).end()
+// })
 
-const generateId = () => {
-  const newId = contacts.length > 0
-    ? Math.max(...contacts.map(i => i.id))
-    : 0
-  return newId + 1
-}
+// const generateId = () => {
+//   const newId = contacts.length > 0
+//     ? Math.max(...contacts.map(i => i.id))
+//     : 0
+//   return newId + 1
+// }
 
-// POST request
-app.post('/api/persons', (request, response) => {
-  const body = request.body
+// // POST request
+// app.post('/api/persons', (request, response) => {
+//   const body = request.body
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: 'Name or number is missing'
-    })
-  } else if (contacts.find(person => person.name === body.name)) {
-    return response.status(400).json({
-      error: 'Name must be unique'
-    })
-  }
+//   if (!body.name || !body.number) {
+//     return response.status(400).json({
+//       error: 'Name or number is missing'
+//     })
+//   } else if (contacts.find(person => person.name === body.name)) {
+//     return response.status(400).json({
+//       error: 'Name must be unique'
+//     })
+//   }
 
-  const newPerson = {
-    id: generateId(),
-    name: body.name,
-    number: body.number,
-  }
+//   const newPerson = {
+//     id: generateId(),
+//     name: body.name,
+//     number: body.number,
+//   }
 
-  contacts = contacts.concat(newPerson)
+//   contacts = contacts.concat(newPerson)
 
-  response.json(newPerson)
-})
+//   response.json(newPerson)
+// })
 
-app.get('/info', (request, response) => {
-    const numPersons = contacts.length
-    const currentDate = new Date()
-    response.send(
-        `<p>Phonebook has info for ${numPersons} people</p>
-        </br>
-        <p>${currentDate}</p>`
-    )
-})
+// app.get('/info', (request, response) => {
+//     const numPersons = contacts.length
+//     const currentDate = new Date()
+//     response.send(
+//         `<p>Phonebook has info for ${numPersons} people</p>
+//         </br>
+//         <p>${currentDate}</p>`
+//     )
+// })
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
