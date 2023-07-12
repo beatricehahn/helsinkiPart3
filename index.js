@@ -1,39 +1,8 @@
-// ============ mongoose code ============
-const mongoose = require('mongoose')
 
-// if password includes special characters, this will encode into URI
-const password = encodeURIComponent(process.argv[2])
-
-const url = 
-  `mongodb+srv://hahnb:${password}@phonebook.mkgt8uc.mongodb.net/?retryWrites=true&w=majority`
-
-mongoose.set('strictQuery',false)
-
-mongoose.connect(url)
-  .then(result => {
-    console.log('Established connection with db');
-  })
-  .catch((error) => {
-    console.log('Error connecting to MongoDB:', error.message);
-  })
-
-// contact schema
-const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String
-})
-
-contactSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObbject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
+require('dotenv').config()
 // contact model
-const Contacts = mongoose.model('Contact', contactSchema)
-
+//const Contacts = mongoose.model('Contact', contactSchema)
+const Contacts = require('./models/contact')
 
 // ================= mongoose code ends here ==========
 
@@ -57,28 +26,7 @@ app.use(
 )
 
 
-let contacts = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+let contacts = []
 
 // event handler for root
 app.get('/', (request, response) => {
@@ -157,7 +105,7 @@ app.get('/api/persons', (request, response) => {
 //     )
 // })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
