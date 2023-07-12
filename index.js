@@ -1,17 +1,10 @@
-
-require('dotenv').config()
-// contact model
-//const Contacts = mongoose.model('Contact', contactSchema)
-const Contacts = require('./models/contact')
-
-// ================= mongoose code ends here ==========
-
 const express = require('express')
 const app = express()
-
 const morgan = require('morgan')
-
 const cors = require('cors')
+require('dotenv').config()
+
+const Contacts = require('./models/contact')
 
 app.use(cors())
 app.use(express.json())
@@ -24,7 +17,6 @@ app.use(
     skip: (req) => req.method !== 'POST'
   })
 )
-
 
 let contacts = []
 
