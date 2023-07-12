@@ -20,40 +20,29 @@ app.use(
 
 let contacts = []
 
-// event handler for root
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
-})
-
 // handles HTTP GET requests made to the contacts path
 app.get('/api/persons', (request, response) => {
     Contacts
       .find({})
       .then(notes => {
         response.json(notes)
-
-        //mongoose.connection.close()
       })
 })
 
 // // handles GET request for single resource (one person)
-// app.get('/api/persons/:id', (request, response) => {
-//     const id = Number(request.params.id)
-//     const person = contacts.find(person => person.id === id)
-
-//     if (person) {
-//       response.json(person)
-//     } else {
-//       response.status(400).end()
-//     }
-// })
+app.get('/api/persons/:id', (request, response) => {
+    Contacts.findById(request.params.id).then(person => {
+      response.json(person)
+    })
+})
 
 // // DELETE request
-// app.delete('./api/notes/:id', (request, response) => {
-//   const id = Number(request.params.id)
-//   contacts = contacts.filter(person => person.id !== id)
-//   response.status(204).end()
-// })
+app.delete('./api/notes/:id', (request, response) => {
+  const id = Number(request.params.id)
+  contacts = contacts.filter(person => person.id !== id)
+
+  response.status(204).end()
+})
 
 // const generateId = () => {
 //   const newId = contacts.length > 0
@@ -62,30 +51,23 @@ app.get('/api/persons', (request, response) => {
 //   return newId + 1
 // }
 
-// // POST request
-// app.post('/api/persons', (request, response) => {
-//   const body = request.body
+// POST request
+app.post('/api/persons', (request, response) => {
+  const body = request.body
 
-//   if (!body.name || !body.number) {
-//     return response.status(400).json({
-//       error: 'Name or number is missing'
-//     })
-//   } else if (contacts.find(person => person.name === body.name)) {
-//     return response.status(400).json({
-//       error: 'Name must be unique'
-//     })
-//   }
+  // if (body.content === undefined) {
+  //   return response.status(400).json({ error: 'content missing' })
+  // }
 
-//   const newPerson = {
-//     id: generateId(),
-//     name: body.name,
-//     number: body.number,
-//   }
+  const person = new Contacts({
+    name: body.name,
+    number: body.number
+  })
 
-//   contacts = contacts.concat(newPerson)
-
-//   response.json(newPerson)
-// })
+  person.save().then(savedContact => {
+    response.json(savedContact)
+  }) 
+})
 
 // app.get('/info', (request, response) => {
 //     const numPersons = contacts.length
