@@ -55,9 +55,9 @@ app.delete('./api/notes/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
-  // if (body.content === undefined) {
-  //   return response.status(400).json({ error: 'content missing' })
-  // }
+  if (body.name === undefined) {
+    return response.status(400).json({ error: 'Name is missing' })
+  }
 
   const person = new Contacts({
     name: body.name,
