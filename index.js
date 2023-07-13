@@ -44,7 +44,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 // // handles GET request for single resource (one person)
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Contacts.findById(request.params.id)
     .then(person => {
       if (person) {
@@ -58,7 +58,7 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 // // DELETE request
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Contacts.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
@@ -89,6 +89,21 @@ app.post('/api/persons', (request, response) => {
   person.save().then(savedContact => {
     response.json(savedContact)
   }) 
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+
+  Contacts.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedContact => {
+      response.json(updatedContact)
+    })
+    .catch(error => next(error))
 })
 
 // app.get('/info', (request, response) => {
