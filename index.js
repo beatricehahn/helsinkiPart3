@@ -6,6 +6,20 @@ require('dotenv').config()
 
 const Contacts = require('./models/contact')
 
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformed id'})
+  }
+
+  next(error)
+}
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
 app.use(cors())
 app.use(express.json())
 app.use(express.static('dist'))
@@ -31,9 +45,16 @@ app.get('/api/persons', (request, response) => {
 
 // // handles GET request for single resource (one person)
 app.get('/api/persons/:id', (request, response) => {
-  Contacts.findById(request.params.id).then(person => {
-    response.json(person)
-  })
+  Contacts.findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
+
+    })
+    .catch(error => next(error))
 })
 
 // // DELETE request
@@ -42,7 +63,7 @@ app.delete('/api/persons/:id', (request, response) => {
     .then(result => {
       response.status(204).end()
     })
-    // insert catch error after moving error handling to its own file
+    .catch(error => next(error))
 })
 
 // const generateId = () => {
@@ -79,6 +100,9 @@ app.post('/api/persons', (request, response) => {
 //         <p>${currentDate}</p>`
 //     )
 // })
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
