@@ -23,5 +23,6 @@ module.exports = {
         "ecmaVersion": "latest"
     },
     "rules": {
+        'eqeqeq': 'error'
     }
 }
