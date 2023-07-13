@@ -22,26 +22,27 @@ let contacts = []
 
 // handles HTTP GET requests made to the contacts path
 app.get('/api/persons', (request, response) => {
-    Contacts
-      .find({})
-      .then(notes => {
-        response.json(notes)
-      })
+  Contacts
+    .find({})
+    .then(notes => {
+      response.json(notes)
+    })
 })
 
 // // handles GET request for single resource (one person)
 app.get('/api/persons/:id', (request, response) => {
-    Contacts.findById(request.params.id).then(person => {
-      response.json(person)
-    })
+  Contacts.findById(request.params.id).then(person => {
+    response.json(person)
+  })
 })
 
 // // DELETE request
-app.delete('./api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  contacts = contacts.filter(person => person.id !== id)
-
-  response.status(204).end()
+app.delete('/api/persons/:id', (request, response) => {
+  Contacts.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    // insert catch error after moving error handling to its own file
 })
 
 // const generateId = () => {
