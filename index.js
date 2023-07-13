@@ -34,8 +34,6 @@ app.use(
   })
 )
 
-let contacts = []
-
 // handles HTTP GET requests made to the contacts path
 app.get('/api/persons', (request, response) => {
   Contacts
@@ -62,7 +60,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 // // DELETE request
 app.delete('/api/persons/:id', (request, response, next) => {
   Contacts.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
